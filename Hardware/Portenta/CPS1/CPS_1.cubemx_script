@@ -1,0 +1,5 @@
+config load CPS_1.ioc
+project toolchain Makefile
+project couplefilesbyip 0
+generate code .
+exit

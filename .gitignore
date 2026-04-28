@@ -1,0 +1,57 @@
+# generated files
+/Doxygen/
+/build/
+/build*/
+/_build/
+/cmake-*/
+/*_Debug/
+/*_Release/
+/*_Emulation/
+/.*/
+.~lock*
+*.o
+*.d
+MXTmpFiles/
+*.tmp*
+.clangd
+
+# ci helpers (tools/hex)
+/bin/
+/deploy/
+
+
+# Emulation
+/*.flash
+
+#IDEs
+/.settings/
+.project
+.directory
+/.externalToolBuilders/
+/Scripts/eclipseConfig/config
+/.vscode/
+/.zed/
+/.idea/
+/.run/
+
+
+# python / jupyter
+*.pyc
+__pycache__/
+.cproject
+.ipynb_checkpoints/
+# python virtual env
+venv
+.venv
+
+# user files / cmake
+CMakeLists.txt.user
+CMakeLists.txt.autosave
+CMakeUserPresets.json
+CMakeCache.txt
+*.mxproject
+*.json
+
+/docs/
+/ROMS/
+/HAL/ST

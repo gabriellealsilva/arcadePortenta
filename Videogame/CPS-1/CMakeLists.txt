@@ -1,0 +1,112 @@
+
+set(ST_DRIVERS_STM32H7XX_SRC_CM7 ${HAL_CM7_SRC})
+set(ST_DRIVERS_STM32H7XX_SRC_CM4 ${HAL_CM4_SRC})
+set(ST_DRIVERS_STM32H7XX_INCLUDES ${HAL_DRIVERS_INCLUDES})
+
+set(SOURCES
+    ${FIRMWARE_SRC}
+)
+
+set(VIDEOGAME_SOURCES
+    ${SOURCES}
+)
+
+set(SYSTEM_SOURCES_CM7
+    ${ST_DRIVERS_STM32H7XX_SRC_CM7}
+)
+
+set(SYSTEM_SOURCES_CM4
+    ${ST_DRIVERS_STM32H7XX_SRC_CM4}
+)
+
+set (EMULATOR_SOURCES
+    ${SOURCES}
+    ${EMULATION_SRC}
+)  
+
+set(VIDEOGAME_DEFINES
+    ${FIRMWARE_DEFINES}
+)
+
+set(VIDEOGAME_DEFINES_CM7
+    ${VIDEOGAME_DEFINES}
+    CORE_CM7
+)
+
+set(VIDEOGAME_DEFINES_CM4
+    ${VIDEOGAME_DEFINES}
+    CORE_CM4
+)
+
+set(INCLUDE_DIRECTORIES
+    ${FIRMWARE_INCLUDES}
+)
+
+set(VIDEOGAME_INCLUDE_DIRECTORIES
+    ${INCLUDE_DIRECTORIES}
+)
+
+set(EMULATOR_INCLUDE_DIRECTORIES
+    ${INCLUDE_DIRECTORIES}
+    ${EMULATION_INCLUDES}
+)
+
+set(EMULATOR_DEFINES
+    ${EMULATOR_MAIN_DFEINES}
+)
+
+set(VIDEOGAME_SYSTEM_INCLUDE_DIRECTORIES
+    ${ST_DRIVERS_STM32H7XX_INCLUDES}
+)
+
+set(CM7_LINKER_SCRIPTS
+    ${CMAKE_SOURCE_DIR}/Hardware/Portenta/CPS1/Memory/stm32h747xx_flash_CM7.ld
+    ${CMAKE_SOURCE_DIR}/Hardware/Portenta/CPS1/Memory/stm32h747xx_sram1_CM7.ld)
+
+set(CM4_LINKER_SCRIPTS 
+    ${CMAKE_SOURCE_DIR}/Hardware/Portenta/CPS1/Memory/stm32h747xx_flash_CM4.ld
+    ${CMAKE_SOURCE_DIR}/Hardware/Portenta/CPS1/Memory/stm32h747xx_sram2_CM4.ld)
+
+set(VIDEOGAME_NAME Portenta_CM7_CPS1)
+
+if (CMAKE_CROSSCOMPILING)
+
+
+    add_console(${VIDEOGAME_NAME} "${VIDEOGAME_SOURCES}" "${SYSTEM_SOURCES_CM7}" ${CM7_LINKER_SCRIPTS} "cps1-cm7")
+    target_link_libraries(${VIDEOGAME_NAME} PRIVATE ${FIRMWARE_LINK_LIBS_CM7} lib::portenta::cps1::cm7)
+    target_link_options(${VIDEOGAME_NAME} PRIVATE -Wl,--defsym=FLASHSIZE=2048K,--defsym=BOOTLOADERBLOCKSIZE=256K)
+    target_compile_definitions(${VIDEOGAME_NAME} PRIVATE ${VIDEOGAME_DEFINES_CM7} USE_BOOTLOADER) # Debug and Release uses a bootloader
+    target_include_directories(${VIDEOGAME_NAME} PRIVATE .)
+    target_include_directories(${VIDEOGAME_NAME} PRIVATE ${VIDEOGAME_INCLUDE_DIRECTORIES})
+    target_include_directories(${VIDEOGAME_NAME} SYSTEM PRIVATE ${VIDEOGAME_SYSTEM_INCLUDE_DIRECTORIES})
+
+
+
+
+    set(VIDEOGAME_NAME Portenta_CM4_CPS1)
+
+    add_console(${VIDEOGAME_NAME} "${VIDEOGAME_SOURCES}" "${SYSTEM_SOURCES_CM4}" ${CM4_LINKER_SCRIPTS} "cps1-cm4")
+    target_link_libraries(${VIDEOGAME_NAME} PRIVATE ${FIRMWARE_LINK_LIBS_CM4} lib::portenta::cps1::cm4)
+    target_link_options(${VIDEOGAME_NAME} PRIVATE -Wl,--defsym=FLASHSIZE=2048K,--defsym=BOOTLOADERBLOCKSIZE=256K)
+    target_compile_definitions(${VIDEOGAME_NAME} PRIVATE ${VIDEOGAME_DEFINES_CM4} USE_BOOTLOADER) # Debug and Release uses a bootloader
+    target_include_directories(${VIDEOGAME_NAME} PRIVATE .)
+    target_include_directories(${VIDEOGAME_NAME} PRIVATE ${VIDEOGAME_INCLUDE_DIRECTORIES})
+    target_include_directories(${VIDEOGAME_NAME} SYSTEM PRIVATE ${VIDEOGAME_SYSTEM_INCLUDE_DIRECTORIES})
+
+else ()
+
+    set(VIDEOGAME_NAME CPS-1)
+
+    add_executable(Emulator-${VIDEOGAME_NAME} ${EMULATOR_SOURCES})
+    target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_MAIN_LINK_LIBS} ${EMULATOR_DISPLAY_LINK_LIBS} lib::portenta::cps1::cm7 lib::portenta::cps1::cm4)
+    target_compile_definitions(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_DEFINES} STM32H747xx)
+    target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE .)
+    target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_INCLUDE_DIRECTORIES})
+
+    install(
+       TARGETS Emulator-${VIDEOGAME_NAME}
+       DESTINATION bin/cps1
+    )
+
+
+endif ()
