@@ -44,11 +44,9 @@ set(EMULATOR_MAIN_DEFINES
 )
 
 # SDL3 target selection:
-# The official SDL3 MinGW package ships SDL3::SDL3-shared (DLL).
-# To use a static lib, build SDL3 from source with -DSDL_SHARED=OFF and
-# point SDL3_DIR to its install prefix.
+# The official SDL3 MinGW package ships SDL3::SDL3-shared (DLL) only.
+# SDL3::SDL3 is the canonical alias (resolves to shared or static depending on
+# what is installed).  SDL3main is not shipped with the MinGW DLL package.
 set(EMULATOR_MAIN_LINK_LIBS
-    $<$<PLATFORM_ID:Windows>:SDL3::SDL3-static>
-    $<$<NOT:$<PLATFORM_ID:Windows>>:SDL3::SDL3>
-    SDL3::SDL3main
+    SDL3::SDL3
 )

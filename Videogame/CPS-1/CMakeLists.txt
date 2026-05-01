@@ -52,7 +52,7 @@ set(EMULATOR_INCLUDE_DIRECTORIES
 )
 
 set(EMULATOR_DEFINES
-    ${EMULATOR_MAIN_DFEINES}
+    ${EMULATOR_MAIN_DEFINES}
 )
 
 set(VIDEOGAME_SYSTEM_INCLUDE_DIRECTORIES
@@ -98,10 +98,22 @@ else ()
     set(VIDEOGAME_NAME CPS-1)
 
     add_executable(Emulator-${VIDEOGAME_NAME} ${EMULATOR_SOURCES})
-    target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_MAIN_LINK_LIBS} ${EMULATOR_DISPLAY_LINK_LIBS} lib::portenta::cps1::cm7 lib::portenta::cps1::cm4)
+    target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_MAIN_LINK_LIBS} ${EMULATOR_DISPLAY_LINK_LIBS})
     target_compile_definitions(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_DEFINES} STM32H747xx)
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE .)
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_INCLUDE_DIRECTORIES})
+    # Mark SDL3 headers as system includes so third-party warning noise (-Wuseless-cast, etc.)
+    # is suppressed without touching our strict project warning flags.
+    target_include_directories(Emulator-${VIDEOGAME_NAME} SYSTEM PRIVATE
+        $<TARGET_PROPERTY:SDL3::SDL3,INTERFACE_INCLUDE_DIRECTORIES>)
+
+    # Copy SDL3.dll next to the executable so it can run without modifying PATH.
+    add_custom_command(TARGET Emulator-${VIDEOGAME_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:SDL3::SDL3>
+            $<TARGET_FILE_DIR:Emulator-${VIDEOGAME_NAME}>
+        COMMENT "Copying SDL3.dll to output directory"
+    )
 
     install(
        TARGETS Emulator-${VIDEOGAME_NAME}
