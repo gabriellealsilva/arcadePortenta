@@ -48,7 +48,6 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define CORE_CM4
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/

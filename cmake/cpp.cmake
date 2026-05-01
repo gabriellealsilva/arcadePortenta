@@ -72,7 +72,7 @@ add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wno-non-virtual-dtor>)
 add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wuseless-cast>)
 add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wzero-as-null-pointer-constant>)
 add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Werror=suggest-override>)
-# add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wextra-semi>) a lot of warning from QubiCore and TokenNet
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wextra-semi>)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU") # Clang don't support all GCC warnings
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 14.1)

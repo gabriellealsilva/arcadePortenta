@@ -10,13 +10,18 @@ if (CMAKE_CROSSCOMPILING)
 
 add_library(libPortentaCPS1_CM7 INTERFACE)
 
+set(COMMON_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/Common/Src/syscalls.c
+#    ${CMAKE_CURRENT_LIST_DIR}/Common/Src/sysmem.c
+    ${CMAKE_CURRENT_LIST_DIR}/Common/Src/system_stm32h7xx_dualcore_boot_cm4_cm7.c
+)
+
 target_sources(libPortentaCPS1_CM7 INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/CM7/Src/main.c
     ${CMAKE_CURRENT_LIST_DIR}/CM7/Src/stm32h7xx_hal_msp.c
     ${CMAKE_CURRENT_LIST_DIR}/CM7/Src/stm32h7xx_it.c
     ${CMAKE_CURRENT_LIST_DIR}/Common/Src/syscalls.c  
- #   ${CMAKE_CURRENT_LIST_DIR}/Common/Src/sysmem.c  
-    ${CMAKE_CURRENT_LIST_DIR}/Common/Src/system_stm32h7xx_dualcore_boot_cm4_cm7.c
+    ${COMMON_SRC}
 )
 
 add_library(libPortentaCPS1_CM4 INTERFACE)
@@ -25,9 +30,7 @@ target_sources(libPortentaCPS1_CM4 INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/CM4/Src/main.c
     ${CMAKE_CURRENT_LIST_DIR}/CM4/Src/stm32h7xx_hal_msp.c
     ${CMAKE_CURRENT_LIST_DIR}/CM4/Src/stm32h7xx_it.c
-    ${CMAKE_CURRENT_LIST_DIR}/CM4/Src/syscalls.c    
-  #  ${CMAKE_CURRENT_LIST_DIR}/CM4/Src/sysmem.c
-    ${CMAKE_CURRENT_LIST_DIR}/Common/Src/system_stm32h7xx_dualcore_boot_cm4_cm7.c
+    ${COMMON_SRC}
 )
 endif ()
 
