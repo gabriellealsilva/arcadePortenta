@@ -27,11 +27,12 @@ set(FIRMWARE_LINK_LIBS_CM4
 # ---------------------------------------------------------------------------
 set(EMULATION_SRC
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation/main.cpp
+    ${CMAKE_SOURCE_DIR}/Firmware/Emulation/FilesystemRomSource.cpp
 )
 
 set(EMULATION_INCLUDES
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation
-    ${CMAKE_SOURCE_DIR}/Videogame/CPS1           
+    ${CMAKE_SOURCE_DIR}/Videogame/CPS-1
 )
 
 set(EMULATOR_DEFINES
