@@ -51,6 +51,7 @@ CMakeUserPresets.json
 CMakeCache.txt
 *.mxproject
 *.json
+CLAUDE.md
 
 /docs/
 /ROMS/
