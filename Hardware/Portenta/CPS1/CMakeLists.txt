@@ -10,7 +10,6 @@ if (CMAKE_CROSSCOMPILING)
 
 set(COMMON_SRC
     ${CMAKE_CURRENT_LIST_DIR}/Common/Src/syscalls.c
-#    ${CMAKE_CURRENT_LIST_DIR}/Common/Src/sysmem.c
     ${CMAKE_CURRENT_LIST_DIR}/Common/Src/system_stm32h7xx_dualcore_boot_cm4_cm7.c
 )
 

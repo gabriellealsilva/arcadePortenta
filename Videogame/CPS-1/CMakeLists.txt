@@ -97,50 +97,18 @@ else ()
 
     set(VIDEOGAME_NAME CPS-1)
 
-    # Verify that ROMS/ exists at configure time so the problem is caught before
-    # compilation rather than at runtime.  ROMS_PATH is baked into the binary as
-    # a compile-time string constant; argv[1] can still override it at runtime.
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/ROMS")
-        message(FATAL_ERROR
-            "[ROM] ROMS/ directory not found at ${CMAKE_SOURCE_DIR}/ROMS\n"
-            "      Create it and place CPS-1 game sub-folders inside (e.g. sf2/, sf2ce/).")
-    endif()
-
     add_executable(Emulator-${VIDEOGAME_NAME} ${EMULATOR_SOURCES})
     target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_MAIN_LINK_LIBS} ${EMULATOR_DISPLAY_LINK_LIBS})
     target_compile_definitions(Emulator-${VIDEOGAME_NAME} PRIVATE
         ${EMULATOR_DEFINES}
         STM32H747xx
-        "ROMS_PATH=\"${CMAKE_SOURCE_DIR}/ROMS\"")
+        "ROMS_PATH=\"${ROMS_BASE_PATH}/cps1\"")
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE .)
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_INCLUDE_DIRECTORIES})
-    # Mark SDL3 headers as system includes so third-party warning noise (-Wuseless-cast, etc.)
-    # is suppressed without touching our strict project warning flags.
-    target_include_directories(Emulator-${VIDEOGAME_NAME} SYSTEM PRIVATE
-        $<TARGET_PROPERTY:SDL3::SDL3,INTERFACE_INCLUDE_DIRECTORIES>)
-
-    # Copy SDL3.dll and MSYS2 ucrt64 C++ runtime DLLs next to the executable.
-    set(MSYS2_UCRT64_BIN "C:/msys64/ucrt64/bin")
-    add_custom_command(TARGET Emulator-${VIDEOGAME_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_FILE:SDL3::SDL3>
-            $<TARGET_FILE_DIR:Emulator-${VIDEOGAME_NAME}>
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${MSYS2_UCRT64_BIN}/libstdc++-6.dll"
-            $<TARGET_FILE_DIR:Emulator-${VIDEOGAME_NAME}>
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${MSYS2_UCRT64_BIN}/libgcc_s_seh-1.dll"
-            $<TARGET_FILE_DIR:Emulator-${VIDEOGAME_NAME}>
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${MSYS2_UCRT64_BIN}/libwinpthread-1.dll"
-            $<TARGET_FILE_DIR:Emulator-${VIDEOGAME_NAME}>
-        COMMENT "Copying SDL3.dll and MSYS2 runtime DLLs to output directory"
-    )
 
     install(
        TARGETS Emulator-${VIDEOGAME_NAME}
        DESTINATION bin/cps1
     )
-
 
 endif ()
