@@ -26,8 +26,8 @@ set(FIRMWARE_LINK_LIBS_CM4
 # PC emulator (SDL3) sources
 # ---------------------------------------------------------------------------
 set(EMULATION_SRC
-    ${CMAKE_SOURCE_DIR}/Firmware/Emulation/main.cpp
-    ${CMAKE_SOURCE_DIR}/Firmware/Emulation/FilesystemRomSource.cpp
+ #   ${CMAKE_SOURCE_DIR}/Firmware/Emulation/main.cpp
+ #   ${CMAKE_SOURCE_DIR}/Firmware/Emulation/FilesystemRomSource.cpp
 )
 
 set(EMULATION_INCLUDES
