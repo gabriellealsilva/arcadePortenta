@@ -87,6 +87,9 @@ if (${WIN32})
     add_compile_options(
             -mno-ms-bitfields
     )
+    if (NOT CMAKE_CROSSCOMPILING)
+        add_link_options(-static-libgcc -static-libstdc++)
+    endif ()
 endif ()
 
 

@@ -52,7 +52,7 @@ set(EMULATOR_INCLUDE_DIRECTORIES
 )
 
 set(EMULATOR_DEFINES
-    ${EMULATOR_MAIN_DFEINES}
+    ${EMULATOR_MAIN_DEFINES}
 )
 
 set(VIDEOGAME_SYSTEM_INCLUDE_DIRECTORIES
@@ -98,8 +98,11 @@ else ()
     set(VIDEOGAME_NAME CPS-1)
 
     add_executable(Emulator-${VIDEOGAME_NAME} ${EMULATOR_SOURCES})
-    target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_MAIN_LINK_LIBS} ${EMULATOR_DISPLAY_LINK_LIBS} lib::portenta::cps1::cm7 lib::portenta::cps1::cm4)
-    target_compile_definitions(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_DEFINES} STM32H747xx)
+    target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_MAIN_LINK_LIBS} ${EMULATOR_DISPLAY_LINK_LIBS})
+    target_compile_definitions(Emulator-${VIDEOGAME_NAME} PRIVATE
+        ${EMULATOR_DEFINES}
+        STM32H747xx
+        "ROMS_PATH=\"${ROMS_BASE_PATH}/cps1\"")
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE .)
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_INCLUDE_DIRECTORIES})
 
@@ -107,6 +110,5 @@ else ()
        TARGETS Emulator-${VIDEOGAME_NAME}
        DESTINATION bin/cps1
     )
-
 
 endif ()
