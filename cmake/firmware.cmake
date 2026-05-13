@@ -27,11 +27,12 @@ set(FIRMWARE_LINK_LIBS_CM4
 # ---------------------------------------------------------------------------
 set(EMULATION_SRC
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation/main.cpp
+    ${CMAKE_SOURCE_DIR}/Firmware/Emulation/FilesystemRomSource.cpp
 )
 
 set(EMULATION_INCLUDES
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation
-    ${CMAKE_SOURCE_DIR}/Videogame/CPS1           
+    ${CMAKE_SOURCE_DIR}/Videogame/CPS-1
 )
 
 set(EMULATOR_DEFINES
@@ -43,12 +44,7 @@ set(EMULATOR_MAIN_DEFINES
     USE_SDL
 )
 
-# SDL3 target selection:
-# The official SDL3 MinGW package ships SDL3::SDL3-shared (DLL).
-# To use a static lib, build SDL3 from source with -DSDL_SHARED=OFF and
-# point SDL3_DIR to its install prefix.
 set(EMULATOR_MAIN_LINK_LIBS
     $<$<PLATFORM_ID:Windows>:SDL3::SDL3-static>
     $<$<NOT:$<PLATFORM_ID:Windows>>:SDL3::SDL3>
-    SDL3::SDL3main
 )
