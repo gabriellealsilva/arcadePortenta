@@ -45,6 +45,5 @@ set(EMULATOR_MAIN_DEFINES
 )
 
 set(EMULATOR_MAIN_LINK_LIBS
-    $<$<PLATFORM_ID:Windows>:SDL3::SDL3-static>
-    $<$<NOT:$<PLATFORM_ID:Windows>>:SDL3::SDL3>
+    SDL3::SDL3
 )
