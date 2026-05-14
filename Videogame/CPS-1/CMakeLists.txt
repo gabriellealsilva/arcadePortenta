@@ -106,6 +106,14 @@ else ()
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE .)
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_INCLUDE_DIRECTORIES})
 
+    add_custom_command(TARGET Emulator-${VIDEOGAME_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:Emulator-${VIDEOGAME_NAME}>
+            $<TARGET_FILE_DIR:Emulator-${VIDEOGAME_NAME}>
+        COMMAND_EXPAND_LISTS
+        COMMENT "Copying runtime DLLs"
+    )
+
     install(
        TARGETS Emulator-${VIDEOGAME_NAME}
        DESTINATION bin/cps1

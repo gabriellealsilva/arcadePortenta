@@ -55,24 +55,9 @@ include(cmake/HAL.cmake)
 include(cmake/stm32.cmake)
 
 if (NOT CMAKE_CROSSCOMPILING)
-    # SDL3 is added before cpp.cmake so it does not inherit our strict -Werror flags.
-    CPMAddPackage(
-        NAME SDL3
-        GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-        GIT_TAG "release-3.2.28"
-        OPTIONS
-            "SDL_STATIC ON"
-            "SDL_SHARED OFF"
-            "SDL_TEST_LIBRARY OFF"
-            "BUILD_TESTING OFF"
-    )
+    find_package(SDL3 REQUIRED CONFIG)
 
     set(ROMS_BASE_PATH "${CMAKE_SOURCE_DIR}/ROMS")
-    if(NOT EXISTS "${ROMS_BASE_PATH}")
-        message(FATAL_ERROR
-            "[ROM] ROMS/ directory not found at ${ROMS_BASE_PATH}\n"
-            "      Create it and place console sub-folders inside (e.g. ROMS/cps1/sf2/).")
-    endif()
 endif ()
 
 # Strict warnings apply to our own code and to Musashi, but not to SDL3 above.
