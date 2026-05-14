@@ -99,26 +99,24 @@ else ()
 
     add_executable(Emulator-${VIDEOGAME_NAME} ${EMULATOR_SOURCES})
     target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_MAIN_LINK_LIBS} ${EMULATOR_DISPLAY_LINK_LIBS})
-    target_compile_definitions(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_DEFINES} STM32H747xx)
+    target_compile_definitions(Emulator-${VIDEOGAME_NAME} PRIVATE
+        ${EMULATOR_DEFINES}
+        STM32H747xx
+        "ROMS_PATH=\"${ROMS_BASE_PATH}/cps1\"")
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE .)
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_INCLUDE_DIRECTORIES})
-    # Mark SDL3 headers as system includes so third-party warning noise (-Wuseless-cast, etc.)
-    # is suppressed without touching our strict project warning flags.
-    target_include_directories(Emulator-${VIDEOGAME_NAME} SYSTEM PRIVATE
-        $<TARGET_PROPERTY:SDL3::SDL3,INTERFACE_INCLUDE_DIRECTORIES>)
 
-    # Copy SDL3.dll next to the executable so it can run without modifying PATH.
     add_custom_command(TARGET Emulator-${VIDEOGAME_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_FILE:SDL3::SDL3>
+            $<TARGET_RUNTIME_DLLS:Emulator-${VIDEOGAME_NAME}>
             $<TARGET_FILE_DIR:Emulator-${VIDEOGAME_NAME}>
-        COMMENT "Copying SDL3.dll to output directory"
+        COMMAND_EXPAND_LISTS
+        COMMENT "Copying runtime DLLs"
     )
 
     install(
        TARGETS Emulator-${VIDEOGAME_NAME}
        DESTINATION bin/cps1
     )
-
 
 endif ()

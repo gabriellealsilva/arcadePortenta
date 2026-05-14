@@ -46,19 +46,22 @@ message("CMAKE_BUILD_TYPE is " ${CMAKE_BUILD_TYPE})
 message("COPY_PROTECTION_DISABLED is " ${COPY_PROTECTION_DISABLED})
 message("ASAN is " ${ASAN})
 
-if (NOT CMAKE_CROSSCOMPILING)
-    find_package(SDL3 REQUIRED)
-endif ()
-
 #include(cmake/bootloader.cmake)
+include(cmake/get_cpm.cmake)
 include(cmake/consoles.cmake)
-include(cmake/cpp.cmake)
 include(cmake/cubeMx.cmake)
 include(cmake/firmware.cmake)
-include(cmake/get_cpm.cmake)
 include(cmake/HAL.cmake)
 include(cmake/stm32.cmake)
 
+if (NOT CMAKE_CROSSCOMPILING)
+    find_package(SDL3 REQUIRED CONFIG)
+
+    set(ROMS_BASE_PATH "${CMAKE_SOURCE_DIR}/ROMS")
+endif ()
+
+# Strict warnings apply to our own code and to Musashi, but not to SDL3 above.
+include(cmake/cpp.cmake)
 
 CPMAddPackage(NAME m68000 GIT_REPOSITORY "https://github.com/kstenerud/Musashi.git" GIT_TAG "master") #repo has no tags
 
