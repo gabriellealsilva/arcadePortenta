@@ -1,13 +1,16 @@
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL.h>
-
-#include "BootloaderMenu.h"
-#include "FilesystemRomSource.h"
-
-#include "Log.h"
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
+#include <memory>
+#include <vector>
+
+#include "BootloaderMenu.h"
+#include "FilesystemRomSource.h"
+#include "Log.h"
+#include "RomAssembler.h"
+#include "core/Cps1System.h"
 
 /// @brief CPS-1 native resolution (Street Fighter II reference).
 static constexpr int CPS1_WIDTH = 384;
@@ -106,6 +109,14 @@ int main(int argc, char *argv[])
 
     State state = State::Bootloader;
 
+    // progRom/gfxRom own the assembled ROM bytes; Cps1System only holds
+    // non-owning spans into them (see Cps1System.h), so they must outlive
+    // `system` — declaring them first guarantees that via reverse-order
+    // destruction at scope exit.
+    std::vector<uint8_t> progRom;
+    std::vector<uint8_t> gfxRom;
+    std::unique_ptr<cps1::Cps1System> system;
+
     cps1::BootloaderMenu menu(renderer);
     menu.setGames(romSource.availableGames());
 
@@ -121,17 +132,10 @@ int main(int argc, char *argv[])
                 running = false;
                 break;
             }
-            if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE)
+            if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE &&
+                state == State::Bootloader)
             {
-                if (state == State::Emulating)
-                {
-                    state = State::Bootloader;
-                    SDL_SetWindowTitle(window, "CPS-1 Emulator");
-                }
-                else
-                {
-                    running = false;
-                }
+                running = false;
                 break;
             }
 
@@ -139,9 +143,31 @@ int main(int argc, char *argv[])
             {
                 if (auto sel = menu.handleEvent(event))
                 {
-                    state = State::Emulating;
-                    SDL_SetWindowTitle(window, sel->title);
                     LOG("[EMU] Loading: %s", sel->title);
+
+                    // Destroy any previous system before mutating the
+                    // buffers it may still be pointing at.
+                    system.reset();
+
+                    if (cps1::assembleRomImages(romSource, *sel, progRom, gfxRom))
+                    {
+                        system = std::make_unique<cps1::Cps1System>();
+                        if (system->load(progRom, gfxRom))
+                        {
+                            state = State::Emulating;
+                            SDL_SetWindowTitle(window, sel->title);
+                        }
+                        else
+                        {
+                            SDL_Log("[EMU] Failed to load '%s' — returning to menu", sel->title);
+                            system.reset();
+                        }
+                    }
+                    else
+                    {
+                        SDL_Log("[EMU] Failed to assemble ROM image for '%s' — returning to menu",
+                                sel->title);
+                    }
                 }
             }
         }
@@ -155,12 +181,17 @@ int main(int argc, char *argv[])
         }
         else
         {
-            // ----------------------------------------------------------------
-            // Emulation tick goes here:
-            //   1. Run 68k for one frame's worth of cycles
-            //   2. Render CPS-1 layers + sprites into a staging buffer
-            //   3. Lock framebuffer, blit staged RGB565 pixels, unlock
-            // ----------------------------------------------------------------
+            system->tick();
+
+            // Blit the RGB565 framebuffer produced by Cps1System into the
+            // SDL streaming texture and render it to the window.
+            void *pixels = nullptr;
+            int pitch = 0;
+            SDL_LockTexture(framebuffer, nullptr, &pixels, &pitch);
+            const auto src = system->framebuffer();
+            std::memcpy(pixels, src.data(), src.size_bytes());
+            SDL_UnlockTexture(framebuffer);
+
             SDL_RenderTexture(renderer, framebuffer, nullptr, nullptr);
         }
 
