@@ -65,6 +65,9 @@ include(cmake/cpp.cmake)
 
 CPMAddPackage(NAME m68000 GIT_REPOSITORY "https://github.com/kstenerud/Musashi.git" GIT_TAG "master") #repo has no tags
 
+# Third-party libraries (source fetched above via CPM)
+add_subdirectory(External/musashi)
+
 # IOC / hardware pin config (STM32CubeMX generated)
 add_subdirectory(Hardware/Portenta/CPS1)
 add_subdirectory(Videogame/CPS-1)
