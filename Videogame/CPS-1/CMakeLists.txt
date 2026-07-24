@@ -73,12 +73,14 @@ if (CMAKE_CROSSCOMPILING)
 
 
     add_console(${VIDEOGAME_NAME} "${VIDEOGAME_SOURCES}" "${SYSTEM_SOURCES_CM7}" ${CM7_LINKER_SCRIPTS} "cps1-cm7")
-    target_link_libraries(${VIDEOGAME_NAME} PRIVATE ${FIRMWARE_LINK_LIBS_CM7} lib::portenta::cps1::cm7)
+    target_link_libraries(${VIDEOGAME_NAME} PRIVATE ${FIRMWARE_LINK_LIBS_CM7} lib::portenta::cps1::cm7 musashi)
     target_link_options(${VIDEOGAME_NAME} PRIVATE -Wl,--defsym=FLASHSIZE=2048K,--defsym=BOOTLOADERBLOCKSIZE=256K)
     target_compile_definitions(${VIDEOGAME_NAME} PRIVATE ${VIDEOGAME_DEFINES_CM7} USE_BOOTLOADER) # Debug and Release uses a bootloader
     target_include_directories(${VIDEOGAME_NAME} PRIVATE .)
     target_include_directories(${VIDEOGAME_NAME} PRIVATE ${VIDEOGAME_INCLUDE_DIRECTORIES})
-    target_include_directories(${VIDEOGAME_NAME} SYSTEM PRIVATE ${VIDEOGAME_SYSTEM_INCLUDE_DIRECTORIES})
+    target_include_directories(${VIDEOGAME_NAME} SYSTEM PRIVATE
+        ${VIDEOGAME_SYSTEM_INCLUDE_DIRECTORIES}
+        $<TARGET_PROPERTY:musashi,INTERFACE_INCLUDE_DIRECTORIES>)
 
 
 
@@ -98,13 +100,20 @@ else ()
     set(VIDEOGAME_NAME CPS-1)
 
     add_executable(Emulator-${VIDEOGAME_NAME} ${EMULATOR_SOURCES})
-    target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_MAIN_LINK_LIBS} ${EMULATOR_DISPLAY_LINK_LIBS})
+    target_link_libraries(Emulator-${VIDEOGAME_NAME} PRIVATE
+        ${EMULATOR_MAIN_LINK_LIBS}
+        ${EMULATOR_DISPLAY_LINK_LIBS}
+        musashi)
     target_compile_definitions(Emulator-${VIDEOGAME_NAME} PRIVATE
         ${EMULATOR_DEFINES}
         STM32H747xx
         "ROMS_PATH=\"${ROMS_BASE_PATH}/cps1\"")
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE .)
     target_include_directories(Emulator-${VIDEOGAME_NAME} PRIVATE ${EMULATOR_INCLUDE_DIRECTORIES})
+    # Suppress warnings from third-party headers (SDL3, Musashi).
+    target_include_directories(Emulator-${VIDEOGAME_NAME} SYSTEM PRIVATE
+        $<TARGET_PROPERTY:SDL3::SDL3,INTERFACE_INCLUDE_DIRECTORIES>
+        $<TARGET_PROPERTY:musashi,INTERFACE_INCLUDE_DIRECTORIES>)
 
     add_custom_command(TARGET Emulator-${VIDEOGAME_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
