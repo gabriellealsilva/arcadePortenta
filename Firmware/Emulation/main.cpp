@@ -4,12 +4,14 @@
 #include <cstring>
 #include <filesystem>
 #include <memory>
+#include <optional>
 #include <vector>
 
-#include "BootloaderMenu.h"
 #include "FilesystemRomSource.h"
 #include "Log.h"
 #include "RomAssembler.h"
+#include "SdlMenuRenderer.h"
+#include "UI/BootloaderMenu.h"
 #include "core/Cps1System.h"
 
 /// @brief CPS-1 native resolution (Street Fighter II reference).
@@ -117,7 +119,8 @@ int main(int argc, char *argv[])
     std::vector<uint8_t> gfxRom;
     std::unique_ptr<cps1::Cps1System> system;
 
-    cps1::BootloaderMenu menu(renderer);
+    cps1::SdlMenuRenderer menuRenderer(renderer);
+    cps1::BootloaderMenu<cps1::SdlMenuRenderer> menu(menuRenderer);
     menu.setGames(romSource.availableGames());
 
     bool running = true;
@@ -141,7 +144,22 @@ int main(int argc, char *argv[])
 
             if (state == State::Bootloader)
             {
-                if (auto sel = menu.handleEvent(event))
+                std::optional<cps1::MenuInput> input;
+                if (event.type == SDL_EVENT_KEY_DOWN)
+                {
+                    switch (event.key.key)
+                    {
+                        case SDLK_UP:     input = cps1::MenuInput::Up; break;
+                        case SDLK_DOWN:   input = cps1::MenuInput::Down; break;
+                        case SDLK_RETURN:
+                        case SDLK_KP_ENTER:
+                            input = cps1::MenuInput::Confirm;
+                            break;
+                        default: break;
+                    }
+                }
+
+                if (auto sel = input ? menu.handleInput(*input) : std::nullopt)
                 {
                     LOG("[EMU] Loading: %s", sel->title);
 
