@@ -1,0 +1,244 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "c9a3af45-d4ca-41f4-a93e-a48562308a1b")
+	(paper "A4")
+	(lib_symbols)
+	(sheet
+		(at 161.29 26.67)
+		(size 69.85 30.48)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "39869425-8542-4a77-8405-5328b9fc851e")
+		(property "Sheetname" "audio"
+			(at 161.29 25.9584 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "audio.kicad_sch"
+			(at 161.29 57.7346 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "ArcadePortenta"
+				(path "/c9a3af45-d4ca-41f4-a93e-a48562308a1b"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 25.4)
+		(size 57.15 31.75)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "967ead6e-339b-4b6c-979f-6c11884eb0ac")
+		(property "Sheetname" "vga"
+			(at 93.98 24.6884 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "vga.kicad_sch"
+			(at 93.98 57.7346 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "ArcadePortenta"
+				(path "/c9a3af45-d4ca-41f4-a93e-a48562308a1b"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 33.02 25.4)
+		(size 52.07 31.75)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "b7b4769a-eb1b-43e3-9622-47e600f56269")
+		(property "Sheetname" "Portenta"
+			(at 33.02 24.6884 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "portenta.kicad_sch"
+			(at 33.02 57.7346 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "ArcadePortenta"
+				(path "/c9a3af45-d4ca-41f4-a93e-a48562308a1b"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 70)
+		(size 52.07 31.75)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "f8010100-8816-4cfc-92ee-8ff456f085b5")
+		(property "Sheetname" "inputs"
+			(at 93.98 69.3 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "inputs.kicad_sch"
+			(at 93.98 102.3 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "ArcadePortenta"
+				(path "/c9a3af45-d4ca-41f4-a93e-a48562308a1b"
+					(page "6")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 33.02 70)
+		(size 52.07 31.75)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "fd42391f-950e-4f20-9a18-c10af38de672")
+		(property "Sheetname" "power"
+			(at 33.02 69.3 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power.kicad_sch"
+			(at 33.02 102.3 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "ArcadePortenta"
+				(path "/c9a3af45-d4ca-41f4-a93e-a48562308a1b"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
