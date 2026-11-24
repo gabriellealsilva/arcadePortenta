@@ -9,7 +9,7 @@ Current branch when written: `refactoring/separating_bootloader_menus`, with unc
 ---
 
 ## Recently done
-- 2026-11-24: Installed MAME 0.289 as reference; fixed `megaman.h` (word-swapped chips, correct offsets) and `sf2.h` (correct prog pairing, added 12 GFX chips). Debug build passes.
+- 2026-11-24: MAME 0.289 installed as reference. Every `Games/*.h` table audited against MAME `cps1.cpp` (all 17 match); fixed `megaman`, `sf2`, `sf2ce`, `1941`. Real CPS-1 memory map + CPS-B config + palette build in `Cps1System`; headless snapshot CLI; `main.cpp` split into `CommandLine`/`SdlDisplay`/`GameSession`.
 
 - 2026-11-11 — Carrier PCB KiCad project moved into the repo at `Hardware/CarrierPCB/`; `CLAUDE.md` replaced by `AGENTS.md`; this file added.
 - 2026-07-31 — Schematic fully regenerated (5 sheets, ERC 0 errors); `docs/HARDWARE_PLAN.md` written with the verified pin map; bootloader architecture decided (microSD → QSPI self-flash).
@@ -22,16 +22,17 @@ Current branch when written: `refactoring/separating_bootloader_menus`, with unc
 ## 1. Software — emulator core
 
 - [x] Musashi 68k vendored and generated via CMake
-- [x] Memory map: program ROM, work RAM, GFX RAM, palette RAM, CPS-A registers
+- [x] Memory map follows MAME `main_map`: I/O `0x800000`, CPS-A `0x800100`, CPS-B `0x800140`, GFX RAM `0x900000`, work RAM `0xFF0000` (2026-11-24; was wrong before)
 - [x] 68k boots from ROM reset vector (verified with `1941`)
 - [x] VBlank IRQ and ~one frame of cycles per `tick()`
 - [~] Frame renderer: background colour, Scroll1 (8×8) and a basic 16×16 sprite pass only
 - [ ] Scroll2 (16×16) and Scroll3 (32×32) layers
 - [ ] Correct layer/sprite priority and the CPS-B layer-control registers
-- [ ] CPS-B register emulation (ID/protection reads, raster IRQ)
+- [~] CPS-B registers: per-title ID and multiplier protection done for all 17 titles (`core/CpsBConfig.*`); raster IRQ and layer-control use still to do
 - [ ] GFX ROM 4-bpp planar → linear decode with tile cache (currently not decoded at load)
+- [ ] Per-game GFX bank mapper (MAME `gfx_range` tables) — tile codes are used as raw ROM indices today
 - [ ] Palette-resolve to RGB565 per scanline (scanline-accurate rendering)
-- [ ] Inputs: map ports `0x800000`–`0x80001F` (joysticks, buttons, coin, start, DIPs)
+- [~] Inputs: ports `0x800000`–`0x80001F` return idle (all ones); real joystick/coin/start/DIP values still to do
 - [ ] Z80 sound CPU core + 68k→Z80 sound latch
 - [ ] YM2151 (ymfm) and OKI MSM6295
 - [ ] Audio mixer to 32 kHz S16 stereo
@@ -47,8 +48,9 @@ Current branch when written: `refactoring/separating_bootloader_menus`, with unc
 - [ ] Commit and merge the in-flight menu refactor (branch `refactoring/separating_bootloader_menus`)
 - [ ] SDL audio queue backend
 - [ ] Keyboard + gamepad → CPS-1 input ports
-- [ ] CLI flags: game id, save-state load/save
-- [ ] Visually confirm `megaman` and `sf2` boot in the host emulator (layouts fixed 2026-11-24; reset vectors verified from files only)
+- [x] CLI flags: `--game`, `--frames`, `--snapshot <png>`, `--trace` (headless PNG snapshot + PC trace)
+- [ ] CLI flags: save-state load/save
+- [ ] Investigate why `1941` and `sf2ce` sit in a wait loop (PC 0x000840 / 0x0001C8) and `megaman` stays black; `sf2` draws a garbled tile layer
 
 ## 3. Software — Portenta firmware
 

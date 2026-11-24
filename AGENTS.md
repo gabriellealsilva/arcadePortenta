@@ -19,10 +19,10 @@ It is a one-person project. The author works on Windows 11 with VS Code, CMake, 
 
 | Path | What lives there |
 |------|------------------|
-| `Videogame/CPS-1/core/` | Platform-independent CPS-1 emulation: `Cps1System` (memory map, Musashi glue, frame render), `RomLayout.h` + `GameLayouts.cpp` + `Games/*.h` (per-title ROM chip layouts) |
+| `Videogame/CPS-1/core/` | Platform-independent CPS-1 emulation: `Cps1System` (MAME-accurate memory map, Musashi glue, palette build, provisional frame render), `CpsBConfig` (per-title CPS-B ID/multiplier/input setup), `RomLayout.h` + `GameLayouts.cpp` + `Games/*.h` (per-title ROM chip layouts) |
 | `Videogame/CPS-1/Rom/` | `RomDefs.h` (`RomEntry`, `GameDescriptor`) and `IRomSource.h` (CRTP ROM-source base) |
 | `Videogame/CPS-1/UI/BootloaderMenu.h` | Backend-neutral bootloader menu logic, shared by emulator and hardware |
-| `Firmware/Emulation/` | **Host (Windows/SDL3) backend**: `main.cpp`, `FilesystemRomSource`, `RomAssembler`, `SdlMenuRenderer.h`, `SdlMenuController.h`, `Log.h` |
+| `Firmware/Emulation/` | **Host (Windows/SDL3) backend**: `main.cpp` (flow + event loop), `CommandLine`, `SdlDisplay` (window/renderer/texture), `GameSession` (ROM buffers + running system), `Snapshot` (PNG), `FilesystemRomSource`, `RomAssembler`, `BootloaderMenu.h`, `Log.h` |
 | `Firmware/Loop/` | Firmware entry points for CM7 / CM4 (`mainFirmware.cpp`, currently empty loops) |
 | `Hardware/Portenta/CPS1/` | STM32CubeMX project (`CPS_1.ioc`, `CPS_1.cubemx_script`), generated HAL init for CM7/CM4/Common, linker scripts in `Memory/` |
 | `Hardware/CarrierPCB/` | **KiCad 10 project for the carrier PCB** (schematics, empty PCB layout, `gen_sch.py` generator) |
@@ -98,6 +98,14 @@ cmake --build --preset=win-emulation-debug
 
 (`win-emulation-release` works the same way.) Add `-DASAN=ON` at configure time for AddressSanitizer in debug builds. ROM folder: pass `ROMS/cps1` as `argv[1]`, or rely on the `ROMS_PATH` macro baked in at configure time (`<repo>/ROMS/cps1`).
 
+**Headless diagnostics** (no menu, no visible window):
+
+```
+Emulator-CPS-1.exe [romsDir] --game 1941 --frames 600 --snapshot out.png --trace
+```
+
+`--game <id>` boots a title directly; `--snapshot <png>` runs `--frames` frames (default 600), saves the framebuffer and exits; `--trace` prints the 68000 PC every 60 frames to stderr. A PC that stays constant for hundreds of frames means the CPU is stuck in a wait loop.
+
 **Firmware (ARM cross-compile)**
 
 ```
@@ -138,8 +146,9 @@ There is **no automated test suite or CI yet**. Verify host changes by building 
 
 ## 7. Known pitfalls
 
-- MAME 0.289 `-verifyroms` (2026-11-24) passes `1941` and `sf2`; `sf2ce` and `megaman` fail only on the `ioc1.ic7` PAL (wrong length, irrelevant to emulation). The old "bad dump" claims for `megaman`/`sf2` were wrong: the layout tables in `Games/megaman.h` and `Games/sf2.h` were fixed against MAME `cps1.cpp` (reset vectors now sane). All four sets should be usable; confirm visually when convenient.
-- MAME is installed at `C:\Users\gabri\Desktop\Codes\mame-0289\bin\mame.exe` (outside the repo) as a reference: `mame.exe -rompath ROMS/cps1 -verifyroms <game>`.
+- ROM layouts: every `Games/*.h` table was audited against MAME `cps1.cpp` on 2026-11-24 (all 17 match) after `megaman`, `sf2`, `sf2ce` and `1941` turned out to be wrong. The old note that `megaman`/`sf2` were "bad dumps" was a layout bug, not bad data. MAME `-verifyroms` passes `1941` and `sf2`; `sf2ce`/`megaman` fail only on the `ioc1.ic7` PAL (wrong length, irrelevant to emulation). Layouts come from `ROM_START` blocks: `ROM_LOAD16_BYTE` = `P16`, `ROM_LOAD16_WORD_SWAP` = `P16S`, `ROM_LOAD64_WORD` = `G64`.
+- The renderer in `Cps1System` is a provisional debug view (Scroll1 + simple sprites). Tile codes are used as raw GFX ROM indices: the per-game GFX bank mapper and the real tile bit layout are not implemented, so `sf2` draws a garbled tile layer. `1941`/`sf2ce` stall in a wait loop and `megaman` stays black (see STATUS.md).
+- MAME 0.289 is installed at `C:\Users\gabri\Desktop\Codes\mame-0289\bin\mame.exe` (outside the repo) as a reference. Its source for `cps1.cpp`, `cps1_v.cpp` (CPS-B configs, palette, video) and `cps1.h` is saved beside it. Verify dumps with `mame.exe -rompath ROMS/cps1 -verifyroms <game>`. Run MAME from outside the repo: it writes `cfg/` and `snap/` into its working directory.
 - ROM files are copyrighted and git-ignored. Never commit them; never add a feature that downloads them.
 - Musashi is under a non-commercial licence. Swapping it for a permissive 68k core is a prerequisite if the project is ever distributed.
 - `.gitignore` ignores `*.json`, `/docs/`, `/ROMS/` and `/HAL/ST` on purpose. If a new tracked `.json` file is needed, add a `!` exception.
