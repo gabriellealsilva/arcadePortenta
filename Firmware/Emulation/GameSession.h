@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include <span>
+#include <string_view>
 #include <vector>
 
 #include "Rom/RomDefs.h"
@@ -31,15 +32,20 @@ public:
 
     bool active() const { return system_ != nullptr; }
 
-    /// @brief Run one video frame.
-    void tick() { system_->tick(); }
+    /// @brief Run one video frame. Prints a PC trace line every 60 frames if @p trace.
+    void tick(bool trace);
 
     std::span<const uint16_t> framebuffer() const { return system_->framebuffer(); }
+    uint32_t                  programCounter() const { return system_->programCounter(); }
 
 private:
     std::vector<uint8_t>        progRom_;
     std::vector<uint8_t>        gfxRom_;
     std::unique_ptr<Cps1System> system_;
+    int                         frames_ = 0;
 };
+
+/// @brief Find a game by folder id in a scanned list, or @c nullptr.
+const GameDescriptor* findGame(std::span<const GameDescriptor> games, std::string_view id);
 
 } // namespace cps1

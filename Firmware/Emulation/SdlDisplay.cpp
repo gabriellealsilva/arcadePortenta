@@ -5,7 +5,7 @@
 namespace cps1
 {
 
-bool SdlDisplay::init(int width, int height, int scale)
+bool SdlDisplay::init(int width, int height, int scale, bool hidden)
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
@@ -15,7 +15,7 @@ bool SdlDisplay::init(int width, int height, int scale)
     sdlInit_ = true;
 
     window_ = SDL_CreateWindow("CPS-1 Emulator", width * scale, height * scale,
-                               SDL_WINDOW_RESIZABLE);
+                               SDL_WINDOW_RESIZABLE | (hidden ? SDL_WINDOW_HIDDEN : 0));
     if (!window_)
     {
         SDL_Log("SDL_CreateWindow: %s", SDL_GetError());

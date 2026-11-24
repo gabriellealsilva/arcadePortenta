@@ -17,9 +17,9 @@ public:
     SdlDisplay(const SdlDisplay&)            = delete;
     SdlDisplay& operator=(const SdlDisplay&) = delete;
 
-    /// @brief Create the window at @p scale x the logical size.
+    /// @brief Create the window (hidden if @p hidden) at @p scale x the logical size.
     /// @return @c false (error already logged) on any SDL failure.
-    bool init(int width, int height, int scale);
+    bool init(int width, int height, int scale, bool hidden);
 
     SDL_Renderer* renderer() const { return renderer_; }
     void setTitle(const char* title) const { SDL_SetWindowTitle(window_, title); }

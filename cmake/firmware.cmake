@@ -32,6 +32,7 @@ set(EMULATION_SRC
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation/CommandLine.cpp
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation/GameSession.cpp
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation/SdlDisplay.cpp
+    ${CMAKE_SOURCE_DIR}/Firmware/Emulation/Snapshot.cpp
     ${CMAKE_SOURCE_DIR}/Videogame/CPS-1/core/Cps1System.cpp
     ${CMAKE_SOURCE_DIR}/Videogame/CPS-1/core/GameLayouts.cpp
 )
