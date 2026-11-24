@@ -10,9 +10,9 @@ namespace cps1::games
 
 inline constexpr RomSlot kMegamanProg[] =
 {
-    P16("rcmu_21a.6f", 0x80000, 0x000000, 0),
-    P16("rcmu_22b.7f", 0x80000, 0x000000, 1),
-    P16("rcmu_23b.8f", 0x80000, 0x100000, 1),
+    P16S("rcmu_23b.8f", 0x80000, 0x000000),
+    P16S("rcmu_22b.7f", 0x80000, 0x080000),
+    P16S("rcmu_21a.6f", 0x80000, 0x100000),
 };
 
 inline constexpr RomSlot kMegamanGfx[] =
@@ -42,7 +42,7 @@ inline constexpr RomSlot kMegamanGfx[] =
 inline constexpr GameLayout kMegaman =
 {
     "megaman", "Mega Man: The Power Battle",
-    kMegamanProg, 0x200000,  // same layout as sf2ce; third chip reaches 0x1FFFFF
+    kMegamanProg, 0x200000,  // 3 standalone word-swapped chips (MAME ROM_LOAD16_WORD_SWAP)
     kMegamanGfx,  0x800000,
 };
 

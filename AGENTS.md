@@ -138,7 +138,8 @@ There is **no automated test suite or CI yet**. Verify host changes by building 
 
 ## 7. Known pitfalls
 
-- `ROMS/cps1/megaman/` is **not a real dump** (garbage 68k reset vector). `sf2` has missing or placeholder GFX ROMs. Use **`1941`** or **`sf2ce`** for boot and regression checks.
+- MAME 0.289 `-verifyroms` (2026-11-24) passes `1941` and `sf2`; `sf2ce` and `megaman` fail only on the `ioc1.ic7` PAL (wrong length, irrelevant to emulation). The old "bad dump" claims for `megaman`/`sf2` were wrong: the layout tables in `Games/megaman.h` and `Games/sf2.h` were fixed against MAME `cps1.cpp` (reset vectors now sane). All four sets should be usable; confirm visually when convenient.
+- MAME is installed at `C:\Users\gabri\Desktop\Codes\mame-0289\bin\mame.exe` (outside the repo) as a reference: `mame.exe -rompath ROMS/cps1 -verifyroms <game>`.
 - ROM files are copyrighted and git-ignored. Never commit them; never add a feature that downloads them.
 - Musashi is under a non-commercial licence. Swapping it for a permissive 68k core is a prerequisite if the project is ever distributed.
 - `.gitignore` ignores `*.json`, `/docs/`, `/ROMS/` and `/HAL/ST` on purpose. If a new tracked `.json` file is needed, add a `!` exception.

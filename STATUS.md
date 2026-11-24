@@ -9,6 +9,7 @@ Current branch when written: `refactoring/separating_bootloader_menus`, with unc
 ---
 
 ## Recently done
+- 2026-11-24: Installed MAME 0.289 as reference; fixed `megaman.h` (word-swapped chips, correct offsets) and `sf2.h` (correct prog pairing, added 12 GFX chips). Debug build passes.
 
 - 2026-11-11 — Carrier PCB KiCad project moved into the repo at `Hardware/CarrierPCB/`; `CLAUDE.md` replaced by `AGENTS.md`; this file added.
 - 2026-07-31 — Schematic fully regenerated (5 sheets, ERC 0 errors); `docs/HARDWARE_PLAN.md` written with the verified pin map; bootloader architecture decided (microSD → QSPI self-flash).
@@ -47,7 +48,7 @@ Current branch when written: `refactoring/separating_bootloader_menus`, with unc
 - [ ] SDL audio queue backend
 - [ ] Keyboard + gamepad → CPS-1 input ports
 - [ ] CLI flags: game id, save-state load/save
-- [ ] Replace placeholder ROM data: `megaman` is not a real dump, `sf2` GFX is missing/placeholder
+- [ ] Visually confirm `megaman` and `sf2` boot in the host emulator (layouts fixed 2026-11-24; reset vectors verified from files only)
 
 ## 3. Software — Portenta firmware
 
