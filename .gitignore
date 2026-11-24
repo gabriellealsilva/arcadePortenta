@@ -55,3 +55,12 @@ CLAUDE.md
 /docs/
 /ROMS/
 /HAL/ST
+
+# KiCad carrier PCB (Hardware/CarrierPCB): *.json above would swallow the project file
+!/Hardware/CarrierPCB/*.kicad_pro
+/Hardware/CarrierPCB/.history/
+/Hardware/CarrierPCB/*-backups/
+/Hardware/CarrierPCB/~*.lck
+/Hardware/CarrierPCB/*.kicad_sch-bak
+/Hardware/CarrierPCB/fp-info-cache
+/Hardware/CarrierPCB/*.lnk
