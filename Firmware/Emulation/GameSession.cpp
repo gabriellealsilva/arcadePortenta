@@ -4,6 +4,7 @@
 #include <cstdio>
 
 #include "Log.h"
+#include "core/CpsBConfig.h"
 #include "RomAssembler.h"
 
 namespace cps1
@@ -23,8 +24,15 @@ bool GameSession::start(FilesystemRomSource& src, const GameDescriptor& game)
         return false;
     }
 
+    const CpsBConfig* cpsb = findCpsBConfig(game.id);
+    if (!cpsb)
+    {
+        SDL_Log("[EMU] No CPS-B configuration for '%s'", game.id);
+        return false;
+    }
+
     system_ = std::make_unique<Cps1System>();
-    if (!system_->load(progRom_, gfxRom_))
+    if (!system_->load(progRom_, gfxRom_, *cpsb))
     {
         SDL_Log("[EMU] Failed to load '%s'", game.title);
         system_.reset();
