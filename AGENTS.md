@@ -30,7 +30,7 @@ It is a one-person project. The author works on Windows 11 with VS Code, CMake, 
 | `External/musashi/` | CMake wrapper around the Musashi 68000 core (fetched/generated at configure time) |
 | `cmake/` | Build modules: toolchain, flags, HAL, CubeMX, firmware, console targets |
 | `ROMS/cps1/<game>/` | Local ROM chip dumps (git-ignored, user-supplied): `1941`, `sf2`, `sf2ce`, `megaman` |
-| `docs/` | `HARDWARE_PLAN.md` (authoritative hardware decisions + pin map), `IMPLEMENTATION_PLAN.md` (original roadmap, partly superseded). **Git-ignored — local only.** |
+| `docs/` | `HARDWARE_PLAN.md` (authoritative hardware decisions + pin map), `IMPLEMENTATION_PLAN.md` (original roadmap, partly superseded), Arduino schematics/datasheets for the Portenta H7 (ABX00042) and Breakout (ASX00031). **Git-ignored — local only.** |
 | `STATUS.md` | Done / in-progress / to-do checklist. **The place to record progress.** |
 
 ## 3. Architecture
