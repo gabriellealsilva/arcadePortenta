@@ -150,6 +150,11 @@ bool Cps1System::load(std::span<const uint8_t> progRom, std::span<const uint8_t>
     return true;
 }
 
+uint32_t Cps1System::programCounter() const
+{
+    return m68k_get_reg(nullptr, M68K_REG_PC);
+}
+
 void Cps1System::tick()
 {
     m68k_execute(CYCLES_PER_FRAME);
