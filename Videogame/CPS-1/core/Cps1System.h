@@ -46,6 +46,9 @@ public:
     /// @brief RGB565 framebuffer, 384 × 224 pixels in row-major order.
     std::span<const uint16_t> framebuffer() const { return fb; }
 
+    /// @brief Current 68000 program counter (diagnostics only).
+    uint32_t programCounter() const;
+
     // -----------------------------------------------------------------------
     // Memory dispatch — public so the global Musashi C callbacks can reach
     // them.  Not part of the external API; do not call directly.
