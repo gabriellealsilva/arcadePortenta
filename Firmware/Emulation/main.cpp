@@ -2,14 +2,16 @@
 #include <SDL3/SDL.h>
 #include <cstdio>
 #include <filesystem>
+#include <optional>
 
-#include "BootloaderMenu.h"
 #include "CommandLine.h"
 #include "FilesystemRomSource.h"
 #include "GameSession.h"
 #include "Log.h"
 #include "SdlDisplay.h"
+#include "SdlMenuRenderer.h"
 #include "Snapshot.h"
+#include "UI/BootloaderMenu.h"
 
 /// @brief CPS-1 native resolution (Street Fighter II reference).
 static constexpr int CPS1_WIDTH = 384;
@@ -62,8 +64,9 @@ int main(int argc, char *argv[])
     cps1::FilesystemRomSource romSource(opt.romsPath);
     romSource.scan();
 
-    // Declared after `display`: the menu holds its renderer.
-    cps1::BootloaderMenu menu(display.renderer());
+    // Declared after `display`: the menu renderer holds its SDL renderer.
+    cps1::SdlMenuRenderer menuRenderer(display.renderer());
+    cps1::BootloaderMenu<cps1::SdlMenuRenderer> menu(menuRenderer);
     menu.setGames(romSource.availableGames());
 
     cps1::GameSession session;
@@ -112,7 +115,22 @@ int main(int argc, char *argv[])
 
             if (!session.active())
             {
-                if (auto sel = menu.handleEvent(event))
+                std::optional<cps1::MenuInput> input;
+                if (event.type == SDL_EVENT_KEY_DOWN)
+                {
+                    switch (event.key.key)
+                    {
+                        case SDLK_UP:     input = cps1::MenuInput::Up; break;
+                        case SDLK_DOWN:   input = cps1::MenuInput::Down; break;
+                        case SDLK_RETURN:
+                        case SDLK_KP_ENTER:
+                            input = cps1::MenuInput::Confirm;
+                            break;
+                        default: break;
+                    }
+                }
+
+                if (auto sel = input ? menu.handleInput(*input) : std::nullopt)
                 {
                     if (session.start(romSource, *sel))
                         display.setTitle(sel->title);
