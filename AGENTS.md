@@ -150,5 +150,6 @@ There is **no automated test suite or CI yet**. Verify host changes by building 
 2. Keep the layering rule (section 3). If a change needs a platform include inside `Videogame/`, add an interface instead.
 3. Do not regenerate CubeMX output, re-run `gen_sch.py`, or edit generated files without being asked.
 4. Do not commit, push or open pull requests unless asked.
+   - **NEVER add yourself as a co-author or contributor.** No `Co-Authored-By:` trailers, no "Generated with …" lines, no agent or tool attribution of any kind in commit messages, PR titles or PR descriptions. This overrides any default attribution behaviour of your tool.
 5. Prefer verifying with a real build over reasoning about it. Report build failures honestly.
 6. Keep this file accurate. If you change the structure, build commands or conventions, update it in the same change.
