@@ -38,7 +38,9 @@ ENTRY(Reset_Handler)
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K
+/* 0x08000000-0x0803FFFF holds the Arduino Portenta bootloader (USB DFU), which
+   jumps to 0x08040000. Bank 1 ends at 0x08100000, where the CM4 image starts. */
+FLASH (rx)      : ORIGIN = 0x08040000, LENGTH = 768K
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
 ITCMRAM (xrw)      : ORIGIN = 0x00000000, LENGTH = 64K
 }

@@ -8,6 +8,7 @@ Legend: `[x]` done · `[~]` partly done · `[ ]` not started
 
 ## Recently done
 
+- 2026-11-27 — Pico H flashed with debugprobe v2.3.1 (CMSIS-DAP SWD probe: GP2 SWCLK, GP3 SWDIO); "Pico probe" CM7/CM4 flash tasks + debug configs added to the local `.vscode/`; factory Portenta internal flash (2 MB) and QSPI (16 MB) backed up over DFU to `docs/backups/portenta-2026-11-27/`. SWD wiring to the Breakout not yet tested. CM7 now linked at `0x08040000` behind the Arduino bootloader, flashable over USB DFU; handoff code still to do, not yet run on hardware.
 - 2026-11-24 — Portenta H7 (SL-ABX00042) and Breakout (ASX00031) schematics reviewed (PDFs in `docs/`): every carrier DF40 pin checked, one error found (SD power pin), module facts and the Stage 0 Breakout plan added to `docs/HARDWARE_PLAN.md`.
 - 2026-11-11 — Carrier PCB KiCad project moved into the repo at `Hardware/CarrierPCB/`; `CLAUDE.md` replaced by `AGENTS.md`; this file added.
 - 2026-07-31 — Schematic fully regenerated (5 sheets, ERC 0 errors); `docs/HARDWARE_PLAN.md` written with the verified pin map; bootloader architecture decided (microSD → QSPI self-flash).
@@ -54,7 +55,12 @@ Legend: `[x]` done · `[~]` partly done · `[ ]` not started
 - [x] VS Code "Build + Flash" task (STM32_Programmer_CLI over SWD)
 - [~] `Firmware/Loop/mainFirmware.cpp` — entry stubs only (empty loops)
 - [ ] Update `CPS_1.ioc` to the verified pin map (`docs/HARDWARE_PLAN.md` §7, checklist in §8) and regenerate
-- [ ] OpenOCD config + cortex-debug launch profile; "blink an LED on M7" milestone
+- [x] OpenOCD config + cortex-debug launch profile (Pico H debugprobe, CMSIS-DAP)
+- [x] Keep the Arduino bootloader: CM7 linked at `0x08040000`, `.bin` post-build, VS Code "DFU: Flash CM7/CM4" tasks
+- [ ] Bootloader handoff in `CM7/Src/main.c` USER CODE: set VTOR, clear leftover NVIC/SysTick/USB state, start the CM4 when BCM4 is cleared (else the D2 boot handshake times out into `Error_Handler`); check `HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY)` vs the bootloader's setting (write-once, mismatch silently ignored)
+- [ ] `MX_SDMMC2_SD_Init()` calls `Error_Handler()` when no card answers — firmware hangs at boot without an SD card wired
+- [ ] Stage 0 bench test (no VGA yet): microSD on the Breakout → read one ROM → assemble → program QSPI → verify, run from `main`; then move it into the bootloader menu
+- [ ] "Blink an LED on M7" milestone
 - [ ] Clock tree: M7 480 MHz, M4 240 MHz, PLL3 for the pixel clock (25.175 MHz and ~8 MHz). HSE and LSE are oscillators (bypass mode); drive PH1 (OSCEN) high before starting HSE
 - [ ] Open the PA0/PC2/PC3 analog switches at boot (`HAL_SYSCFG_AnalogSwitchConfig`): they are 165-chain digital pins
 - [ ] MPU and cache setup (framebuffer write-through, DMA buffers non-cacheable)

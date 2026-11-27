@@ -62,7 +62,7 @@ Firmware/Emulation   Firmware/Loop + Hardware/Portenta (LTDC, SAI, SDMMC, GPIO, 
 
 | Region | Address | Size | Use |
 |--------|---------|------|-----|
-| Internal flash | `0x08000000` | 2 MB | Firmware |
+| Internal flash | `0x08000000` | 2 MB | Arduino bootloader (256 KB), CM7 firmware from `0x08040000`, CM4 from `0x08100000` |
 | ITCM | `0x00000000` | 64 KB | Hot 68k state, IRQ vectors |
 | DTCM | `0x20000000` | 128 KB | DMA buffers (non-cacheable) |
 | SRAM1/2/3 | `0x24000000` | 192 KB | GFX RAM, palette, framebuffer cache |
@@ -106,9 +106,15 @@ cmake --build --preset=win-cross-compile-debug
 cmake --build --preset=win-cross-compile-debug --target smoke_builds   # build every target
 ```
 
-Outputs: `build/win-cross-compile-debug/Videogame/Portenta_CM7_CPS1_Debug.elf` and `…_CM4_CPS1_Debug.elf`.
+Outputs: `build/win-cross-compile-debug/Videogame/CPS-1/Portenta_CM7_CPS1_Debug.elf` and `…_CM4_CPS1_Debug.elf`, plus `.hex` and raw `.bin` next to them.
 
-**Flash:** VS Code task "Build + Flash", or `STM32_Programmer_CLI --connect port=swd --download <elf> -hardRst --start`.
+**Flash layout:** the factory **Arduino bootloader stays at `0x08000000`** (USB DFU). CM7 firmware is linked at **`0x08040000`**, CM4 at `0x08100000`. There is **no bootloader handoff code yet**: VTOR, leftover NVIC/USB state and starting the CM4 (Arduino ships with the BCM4 option byte cleared) are still open (see `STATUS.md`).
+
+**Flash:**
+- USB DFU, no probe: double-tap reset (green LED pulses), then VS Code task "DFU: Flash CM7" / "DFU: Flash CM4", i.e. `C:/dfu-util/dfu-util.exe -d 2341:035b -a 0 -s 0x08040000:leave -D <cm7>.bin` (CM4: `0x08100000`). DFU alt 1 is the QSPI flash (`0x90000000`).
+- SWD via a Pico H running debugprobe (CMSIS-DAP; GP2 SWCLK, GP3 SWDIO): tasks "Pico probe: Flash CM7/CM4" and debug configs "CPS-1 CM7/CM4 Debug (Pico probe)". OpenOCD needs `target/stm32h7x_dual_bank.cfg` (CM4 is in bank 2).
+- ST-Link: task "Build + Flash" (`STM32_Programmer_CLI`).
+- Factory flash backups (internal 2 MB + QSPI 16 MB) are in `docs/backups/portenta-2026-11-27/`.
 
 **Carrier PCB:** open `Hardware/CarrierPCB/ArcadePortenta.kicad_pro` in KiCad 10. See section 6.
 

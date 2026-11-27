@@ -49,6 +49,8 @@ function(target_hexfile_post_process target dest_folder)
         TARGET ${target}
         POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} ARGS -O ihex $<TARGET_FILE_NAME:${target}> $<TARGET_FILE_BASE_NAME:${target}>.hex
+        # raw image for USB DFU (dfu-util -s <flash origin>)
+        COMMAND ${CMAKE_OBJCOPY} ARGS -O binary $<TARGET_FILE_NAME:${target}> $<TARGET_FILE_BASE_NAME:${target}>.bin
         COMMAND ${CMAKE_OBJDUMP} ARGS -h -l --inlines --dwarf=decodedline -S $<TARGET_FILE_NAME:${target}> > "$<TARGET_FILE_BASE_NAME:${target}>.list"        
         COMMAND ${CMAKE_SIZE} ARGS --format=berkeley $<TARGET_FILE_NAME:${target}>
         COMMAND ${CMAKE_NM} $<TARGET_FILE_NAME:${target}> > $<TARGET_FILE_BASE_NAME:${target}>.address_info
@@ -59,6 +61,7 @@ function(target_hexfile_post_process target dest_folder)
         APPEND
         PROPERTY ADDITIONAL_CLEAN_FILES
         $<TARGET_FILE_BASE_NAME:${target}>.hex
+        $<TARGET_FILE_BASE_NAME:${target}>.bin
         $<TARGET_FILE_BASE_NAME:${target}>.list
         $<TARGET_FILE_BASE_NAME:${target}>.map
     )
