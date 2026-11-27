@@ -29,6 +29,9 @@ set(EMULATION_SRC
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation/main.cpp
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation/FilesystemRomSource.cpp
     ${CMAKE_SOURCE_DIR}/Firmware/Emulation/RomAssembler.cpp
+    ${CMAKE_SOURCE_DIR}/Firmware/Emulation/CommandLine.cpp
+    ${CMAKE_SOURCE_DIR}/Firmware/Emulation/GameSession.cpp
+    ${CMAKE_SOURCE_DIR}/Firmware/Emulation/SdlDisplay.cpp
     ${CMAKE_SOURCE_DIR}/Videogame/CPS-1/core/Cps1System.cpp
     ${CMAKE_SOURCE_DIR}/Videogame/CPS-1/core/GameLayouts.cpp
 )
