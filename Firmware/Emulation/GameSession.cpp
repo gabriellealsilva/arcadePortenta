@@ -1,6 +1,7 @@
 #include "GameSession.h"
 
 #include <SDL3/SDL.h>
+#include <cstdio>
 
 #include "Log.h"
 #include "RomAssembler.h"
@@ -14,6 +15,7 @@ bool GameSession::start(FilesystemRomSource& src, const GameDescriptor& game)
 
     // Destroy any previous system before mutating the buffers it may still point at.
     system_.reset();
+    frames_ = 0;
 
     if (!assembleRomImages(src, game, progRom_, gfxRom_))
     {
@@ -29,6 +31,22 @@ bool GameSession::start(FilesystemRomSource& src, const GameDescriptor& game)
         return false;
     }
     return true;
+}
+
+void GameSession::tick(bool trace)
+{
+    system_->tick();
+    ++frames_;
+    if (trace && frames_ % 60 == 0)
+        std::fprintf(stderr, "[TRACE] frame %d PC=0x%06X\n", frames_, system_->programCounter());
+}
+
+const GameDescriptor* findGame(std::span<const GameDescriptor> games, std::string_view id)
+{
+    for (const auto& g : games)
+        if (std::string_view(g.id) == id)
+            return &g;
+    return nullptr;
 }
 
 } // namespace cps1
