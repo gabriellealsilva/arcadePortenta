@@ -1,16 +1,16 @@
 # STATUS.md — what is done, what is left
 
-Last updated: 2026-11-11. Companion to [`AGENTS.md`](AGENTS.md) (what the project is, how it is laid out). Update this file whenever a task finishes or a new one is discovered.
+Last updated: 2026-11-24. Companion to [`AGENTS.md`](AGENTS.md) (what the project is, how it is laid out). Update this file whenever a task finishes or a new one is discovered.
 
 Legend: `[x]` done · `[~]` partly done · `[ ]` not started
-
-Current branch when written: `refactoring/separating_bootloader_menus`, with uncommitted work in `Firmware/Emulation/main.cpp`, `Videogame/CPS-1/UI/BootloaderMenu.h` and the new `Firmware/Emulation/SdlMenuController.h`.
 
 ---
 
 ## Recently done
 - 2026-11-24: MAME 0.289 installed as reference. Every `Games/*.h` table audited against MAME `cps1.cpp` (all 17 match); fixed `megaman`, `sf2`, `sf2ce`, `1941`. Real CPS-1 memory map + CPS-B config + palette build in `Cps1System`; headless snapshot CLI; `main.cpp` split into `CommandLine`/`SdlDisplay`/`GameSession`.
 
+- 2026-11-27 — Pico H flashed with debugprobe v2.3.1 (CMSIS-DAP SWD probe: GP2 SWCLK, GP3 SWDIO); "Pico probe" CM7/CM4 flash tasks + debug configs added to the local `.vscode/`; factory Portenta internal flash (2 MB) and QSPI (16 MB) backed up over DFU to `docs/backups/portenta-2026-11-27/`. SWD wiring to the Breakout not yet tested. CM7 now linked at `0x08040000` behind the Arduino bootloader, flashable over USB DFU; handoff code still to do, not yet run on hardware.
+- 2026-11-24 — Portenta H7 (SL-ABX00042) and Breakout (ASX00031) schematics reviewed (PDFs in `docs/`): every carrier DF40 pin checked, one error found (SD power pin), module facts and the Stage 0 Breakout plan added to `docs/HARDWARE_PLAN.md`.
 - 2026-11-11 — Carrier PCB KiCad project moved into the repo at `Hardware/CarrierPCB/`; `CLAUDE.md` replaced by `AGENTS.md`; this file added.
 - 2026-07-31 — Schematic fully regenerated (5 sheets, ERC 0 errors); `docs/HARDWARE_PLAN.md` written with the verified pin map; bootloader architecture decided (microSD → QSPI self-flash).
 - Bootloader menu split into shared logic (`Videogame/CPS-1/UI/BootloaderMenu.h`) plus SDL renderer/controller for the host.
@@ -58,8 +58,14 @@ Current branch when written: `refactoring/separating_bootloader_menus`, with unc
 - [x] VS Code "Build + Flash" task (STM32_Programmer_CLI over SWD)
 - [~] `Firmware/Loop/mainFirmware.cpp` — entry stubs only (empty loops)
 - [ ] Update `CPS_1.ioc` to the verified pin map (`docs/HARDWARE_PLAN.md` §7, checklist in §8) and regenerate
-- [ ] OpenOCD config + cortex-debug launch profile; "blink an LED on M7" milestone
-- [ ] Clock tree: M7 480 MHz, M4 240 MHz, PLL3 for the pixel clock (25.175 MHz and ~8 MHz)
+- [x] OpenOCD config + cortex-debug launch profile (Pico H debugprobe, CMSIS-DAP)
+- [x] Keep the Arduino bootloader: CM7 linked at `0x08040000`, `.bin` post-build, VS Code "DFU: Flash CM7/CM4" tasks
+- [ ] Bootloader handoff in `CM7/Src/main.c` USER CODE: set VTOR, clear leftover NVIC/SysTick/USB state, start the CM4 when BCM4 is cleared (else the D2 boot handshake times out into `Error_Handler`); check `HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY)` vs the bootloader's setting (write-once, mismatch silently ignored)
+- [ ] `MX_SDMMC2_SD_Init()` calls `Error_Handler()` when no card answers — firmware hangs at boot without an SD card wired
+- [ ] Stage 0 bench test (no VGA yet): microSD on the Breakout → read one ROM → assemble → program QSPI → verify, run from `main`; then move it into the bootloader menu
+- [ ] "Blink an LED on M7" milestone
+- [ ] Clock tree: M7 480 MHz, M4 240 MHz, PLL3 for the pixel clock (25.175 MHz and ~8 MHz). HSE and LSE are oscillators (bypass mode); drive PH1 (OSCEN) high before starting HSE
+- [ ] Open the PA0/PC2/PC3 analog switches at boot (`HAL_SYSCFG_AnalogSwitchConfig`): they are 165-chain digital pins
 - [ ] MPU and cache setup (framebuffer write-through, DMA buffers non-cacheable)
 - [ ] FMC SDRAM init + framebuffer placement
 - [ ] QSPI memory-mapped (XIP) init at `0x90000000`
@@ -96,12 +102,14 @@ Schematic
 - [ ] Assign footprints for every part, run a final ERC, export BOM
 
 Verify before layout (from `docs/HARDWARE_PLAN.md` §12)
-- [ ] DF40 stacking height vs Portenta bottom-side clearance
+- [ ] **Fix in KiCad:** SD socket power label VSD is on J1-74 (SPDIF_TX, NC on the module); move it to J1-72 (VCC 3V3). PE2/PB2 NC labels belong on J1-66/68. Update the `gen_sch.py` table to match (do not re-run it)
+- [x] DF40 stacking height: DF40HC(3.5)-80DS-0.4V(51), same part as the Breakout
 - [ ] DF40 footprint pad numbering matches the odd/even schematic symbol (old symbol Value said "Counter_Clockwise")
-- [ ] V-SDCARD (J1-74) sources 3V3 on the Portenta (fallback JP100 exists)
+- [x] V-SDCARD: no such pin on the H7; the SD socket runs from VCC 3V3 (see the fix above)
 - [ ] PLL3 can hit 25.175 MHz and 8 MHz from the 25 MHz HSE with acceptable jitter
-- [ ] Portenta 3V3 output has headroom for PCM5102 + logic (else add an LDO)
-- [ ] Dual-bonded pads (PB3, PA0, PA4, PC2, PC3, PH11, PH12, PI5–PI7) keep their twin pad NC
+- [x] Portenta 3V3 output: 1 A max, no extra LDO needed
+- [~] Dual-bonded pads (PB3, PA0, PA4, PC2, PC3, PH11, PH12, PI5–PI7) keep their twin pad NC: correct in the `gen_sch.py` table against SL-ABX00042; re-check in KiCad during hand review
+- [ ] PJ6 (LTDC_R7) also drives the on-module USB3320 PHY ID pin: scope R7 on the Breakout with the PHY in reset (PJ4 low)
 - [ ] CRT chassis input levels once a monitor is available
 
 Layout (`ArcadePortenta.kicad_pcb` is still empty of design work)
@@ -111,7 +119,14 @@ Layout (`ArcadePortenta.kicad_pcb` is still empty of design work)
 - [ ] DRC clean, 3D check, gerbers
 
 Fab and bring-up
-- [ ] Stage 0: FabLab (RWTH) prototype without a custom carrier
+- [~] Stage 0 on the Portenta Breakout (ASX00031, bought 2026-11): plan and wiring map in `docs/HARDWARE_PLAN.md` §9
+  - [ ] Solder female 2.54 mm headers; leave jumpers J9–J13 open, SW1 off
+  - [ ] Blink the on-module RGB LED (PK5–PK7), UART1 console via USB-UART
+  - [ ] SD/FAT32 + QSPI self-flash (no extra hardware); jumper SD CD → GPIO_0 (PC13)
+  - [ ] PCM5102A module on the I2S header: 1 kHz sine
+  - [ ] Perfboard 5/6/5 ladder (carrier values) → DE-15: colour bars
+  - [ ] One 74HC165 + buttons, then the full chain
+- [ ] Stage 0b (optional): FabLab (RWTH) milled shield to replace the perfboard
 - [ ] Stage 1: order boards (×2) via AISLER, parts via the shopping list in `HARDWARE_PLAN.md` §10
 - [ ] Power-only smoke test with no module seated
 - [ ] Seat the Portenta, check SWD in OpenOCD

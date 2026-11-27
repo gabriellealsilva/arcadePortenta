@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <span>
 
+#include "core/CpsBConfig.h"
+
 namespace cps1
 {
 
@@ -37,14 +39,20 @@ public:
     /// @brief Wire up an already-assembled ROM image and reset the 68000.
     /// @param progRom Program ROM bytes; see class docs for lifetime rules.
     /// @param gfxRom  GFX ROM bytes; may be empty if the game has none dumped.
+    /// @param cpsb    CPS-B board configuration for this title (see CpsBConfig.h);
+    ///                must outlive this object.
     /// @return @c false if @p progRom is empty (nothing to execute).
-    bool load(std::span<const uint8_t> progRom, std::span<const uint8_t> gfxRom);
+    bool load(std::span<const uint8_t> progRom, std::span<const uint8_t> gfxRom,
+              const CpsBConfig& cpsb);
 
     /// @brief Execute one video frame (~167 k cycles), fire VBlank IRQ, render.
     void tick();
 
     /// @brief RGB565 framebuffer, 384 × 224 pixels in row-major order.
     std::span<const uint16_t> framebuffer() const { return fb; }
+
+    /// @brief Current 68000 program counter (diagnostics only).
+    uint32_t programCounter() const;
 
     // -----------------------------------------------------------------------
     // Memory dispatch — public so the global Musashi C callbacks can reach
@@ -65,18 +73,32 @@ private:
 
     std::span<const uint8_t> progRom;                ///< Non-owning; see class docs
     std::span<const uint8_t> gfxRom;                 ///< Non-owning; see class docs
-    uint8_t  workRam   [64  * 1024] = {};            ///< CPU work RAM   (0xFF0000–0xFFFFFF)
-    uint8_t  gfxRam    [512 * 1024] = {};            ///< GFX / object RAM (0x800000–0x87FFFF)
-    uint8_t  paletteRam[128 * 1024] = {};            ///< Palette RAM    (0x900000–0x91FFFF)
-    uint16_t fb        [WIDTH * HEIGHT] = {};        ///< RGB565 output framebuffer
+    const CpsBConfig*        cpsb = nullptr;         ///< Non-owning; per-title CPS-B setup
+    uint8_t  workRam [64  * 1024] = {};              ///< CPU work RAM (0xFF0000–0xFFFFFF)
+    uint8_t  gfxRam  [192 * 1024] = {};              ///< GFX RAM (0x900000–0x92FFFF): scroll, OBJ, palette source
+    uint16_t palette [0xC00] = {};                   ///< RGB565 palette, rebuilt from gfxRam (6 pages × 512)
+    uint16_t fb      [WIDTH * HEIGHT] = {};          ///< RGB565 output framebuffer
 
-    /// CPS-A write-only registers, base 0xC00000, index = (addr - 0xC00000) / 2.
-    /// [0]  0xC00000  Scroll1 X      [1]  0xC00002  Scroll1 Y
-    /// [2]  0xC00004  Scroll2 X      [3]  0xC00006  Scroll2 Y
-    /// [4]  0xC00008  Scroll3 X      [5]  0xC0000A  Scroll3 Y
-    /// [8]  0xC00010  Scroll1 base   [9]  0xC00012  Scroll2 base
-    /// [10] 0xC00014  Scroll3 base   [11] 0xC00016  OBJ base
+    /// CPS-A write-only registers at 0x800100, index = word offset.
+    /// Names follow MAME's CPS1_* constants (see CpsAReg below).
     uint16_t cpsARegs[32] = {};
+    /// CPS-B registers at 0x800140 (read/write), index = word offset.
+    uint16_t cpsBRegs[32] = {};
+
+    /// CPS-A register word indices.
+    enum CpsAReg : unsigned
+    {
+        ObjBase = 0x00 / 2, Scroll1Base = 0x02 / 2, Scroll2Base = 0x04 / 2,
+        Scroll3Base = 0x06 / 2, OtherBase = 0x08 / 2, PaletteBase = 0x0a / 2,
+        Scroll1X = 0x0c / 2, Scroll1Y = 0x0e / 2, Scroll2X = 0x10 / 2,
+        Scroll2Y = 0x12 / 2, Scroll3X = 0x14 / 2, Scroll3Y = 0x16 / 2,
+        VideoControl = 0x22 / 2,
+    };
+
+    uint32_t readIo16(uint32_t addr) const;   ///< 16-bit read of 0x800000–0x8001FF
+    void     writeIo16(uint32_t addr, uint32_t val);
+    void     buildPalette();
+    uint16_t gfxRamWord(uint32_t byteOff) const;
 };
 
 } // namespace cps1
