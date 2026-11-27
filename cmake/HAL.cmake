@@ -34,11 +34,18 @@ set(HAL_DRIVERS_INCLUDES
 
 set(HAL_CM7_SRC
 ${HAL_DRIVERS_COMMON_SRC}
-${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2s.c
+${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c
+${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c
+${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.c
+${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.c
+${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.c
+${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_qspi.c
+${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma2d.c
 ${STARTUP_STM32H747XX_CM7}
 )
 
 set(HAL_CM4_SRC
-${HAL_DRIVERS_SRC}
+${HAL_DRIVERS_COMMON_SRC}
+${CMAKE_SOURCE_DIR}/HAL/ST/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2s.c
 ${STARTUP_STM32H747XX_CM4}
 )
